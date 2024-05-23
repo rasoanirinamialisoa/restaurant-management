@@ -2,6 +2,8 @@ package com.example.restaurantmanagement.model;
 
 import lombok.*;
 
+import java.time.Instant;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -11,7 +13,7 @@ public class Movements {
     private int id;
     private String type;
     private double quantity;
-    private java.sql.Timestamp date;
+    private Instant date;
     private double quantityRemaining;
     private int idIngredientTemplate;
 

@@ -23,7 +23,7 @@ public class ConnectDatabase {
             instance = new ConnectDatabase();
         } return instance;
     }
-    public Connection getConnection() throws SQLException {
+    public static Connection getConnection() throws SQLException {
         try {
             Connection connection = DriverManager.getConnection(url, password, user);
             if (connection != null) {
