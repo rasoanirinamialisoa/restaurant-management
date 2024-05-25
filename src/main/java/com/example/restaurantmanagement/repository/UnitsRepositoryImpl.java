@@ -10,6 +10,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.example.restaurantmanagement.repository.SetParameter.setParameter;
+
 @Repository
 public class UnitsRepositoryImpl implements UnitsRepository {
 
@@ -64,9 +67,10 @@ public class UnitsRepositoryImpl implements UnitsRepository {
     @Override
     public Units updateUnits(int id, Units units) throws SQLException {
         String query = "UPDATE units SET name = ? WHERE id = ?";
+
         try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setString(1, units.getName());
-            preparedStatement.setInt(2, id);
+            setParameter(preparedStatement, 1, units.getName());
+            setParameter(preparedStatement, 2, id);
 
             int updatedRows = preparedStatement.executeUpdate();
             if (updatedRows > 0) {
@@ -75,6 +79,7 @@ public class UnitsRepositoryImpl implements UnitsRepository {
         }
         return null;
     }
+
 
     private Units mapResultSetToUnits(ResultSet resultSet) throws SQLException {
         Units units = new Units();

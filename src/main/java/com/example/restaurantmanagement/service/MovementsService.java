@@ -10,5 +10,6 @@ public interface MovementsService {
     Movements getMovementsById(int id) throws SQLException;
     Movements createMovements(Movements movements) throws SQLException;
     Movements updateMovements(int id, Movements movements) throws SQLException;
+    Movements updateQuantityRemaining(int id, Movements movements) throws SQLException;
 
 }

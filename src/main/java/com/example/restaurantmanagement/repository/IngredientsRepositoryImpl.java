@@ -4,20 +4,21 @@ import com.example.restaurantmanagement.config.ConnectDatabase;
 import com.example.restaurantmanagement.model.Ingredients;
 import org.springframework.stereotype.Repository;
 
+import static com.example.restaurantmanagement.repository.SetParameter.setParameter;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringJoiner;
+
 @Repository
 public class IngredientsRepositoryImpl implements IngredientsRepository {
 
     private final ConnectDatabase connectDatabase = ConnectDatabase.getInstance();
     private final Connection connection = connectDatabase.getConnection();
-
-    public IngredientsRepositoryImpl() throws SQLException {
-    }
 
     @Override
     public List<Ingredients> getAllIngredients() throws SQLException {
@@ -34,7 +35,7 @@ public class IngredientsRepositoryImpl implements IngredientsRepository {
     }
 
     @Override
-    public Ingredients getIngredientsById(int id) throws SQLException {
+    public Ingredients getIngredientById(int id) throws SQLException {
         String query = "SELECT * FROM ingredients WHERE id = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setInt(1, id);
@@ -48,7 +49,7 @@ public class IngredientsRepositoryImpl implements IngredientsRepository {
     }
 
     @Override
-    public Ingredients createIngredients(Ingredients ingredients) throws SQLException {
+    public Ingredients createIngredient(Ingredients ingredients) throws SQLException {
         String query = "INSERT INTO ingredients (id_ingredient_template, id_menus, quantity_necessary) VALUES (?, ?, ?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setInt(1, ingredients.getIdIngredientTemplate());
@@ -64,13 +65,31 @@ public class IngredientsRepositoryImpl implements IngredientsRepository {
     }
 
     @Override
-    public Ingredients updateIngredientTemplate(int id, Ingredients ingredients) throws SQLException {
-        String query = "UPDATE ingredients SET id_ingredient_template = ?, id_menus = ?, quantity_necessary = ? WHERE id = ?";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setInt(1, ingredients.getIdIngredientTemplate());
-            preparedStatement.setInt(2, ingredients.getIdMenus());
-            preparedStatement.setDouble(3, ingredients.getQuantityNecessary());
-            preparedStatement.setInt(4, id);
+    public Ingredients updateIngredient(int id, Ingredients ingredients) throws SQLException {
+        StringJoiner query = new StringJoiner(", ", "UPDATE ingredients SET ", " WHERE id = ?");
+
+        if (ingredients.getIdIngredientTemplate() != null) {
+            query.add("id_ingredient_template = ?");
+        }
+        if (ingredients.getIdMenus() != null) {
+            query.add("id_menus = ?");
+        }
+        if (ingredients.getQuantityNecessary() != null) {
+            query.add("quantity_necessary = ?");
+        }
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query.toString())) {
+            int parameterIndex = 1;
+            if (ingredients.getIdIngredientTemplate() != null) {
+                setParameter(preparedStatement, parameterIndex++, ingredients.getIdIngredientTemplate());
+            }
+            if (ingredients.getIdMenus() != null) {
+                setParameter(preparedStatement, parameterIndex++, ingredients.getIdMenus());
+            }
+            if (ingredients.getQuantityNecessary() != null) {
+                setParameter(preparedStatement, parameterIndex++, ingredients.getQuantityNecessary());
+            }
+            setParameter(preparedStatement, parameterIndex, id);
 
             int updatedRows = preparedStatement.executeUpdate();
             if (updatedRows > 0) {
@@ -79,6 +98,7 @@ public class IngredientsRepositoryImpl implements IngredientsRepository {
         }
         return null;
     }
+
 
     private Ingredients mapResultSetToIngredients(ResultSet resultSet) throws SQLException {
         Ingredients ingredients = new Ingredients();

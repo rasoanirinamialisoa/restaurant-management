@@ -2,6 +2,7 @@ package com.example.restaurantmanagement.controller;
 
 import com.example.restaurantmanagement.model.Ingredients;
 import com.example.restaurantmanagement.service.IngredientsService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.SQLException;
@@ -13,6 +14,7 @@ public class IngredientsController {
 
     private final IngredientsService ingredientsService;
 
+    @Autowired
     public IngredientsController(IngredientsService ingredientsService) {
         this.ingredientsService = ingredientsService;
     }
@@ -23,17 +25,17 @@ public class IngredientsController {
     }
 
     @GetMapping("/ingredients/{id}")
-    public Ingredients getIngredientsById(@PathVariable int id) throws SQLException {
+    public Ingredients getIngredientById(@PathVariable int id) throws SQLException {
         return ingredientsService.getIngredientsById(id);
     }
 
     @PostMapping("/ingredients")
-    public Ingredients createIngredients(@RequestBody Ingredients ingredients) throws SQLException {
+    public Ingredients createIngredient(@RequestBody Ingredients ingredients) throws SQLException {
         return ingredientsService.createIngredients(ingredients);
     }
 
     @PutMapping("/ingredients/{id}")
-    public Ingredients updateIngredients(@PathVariable int id, @RequestBody Ingredients ingredients) throws SQLException {
+    public Ingredients updateIngredient(@PathVariable int id, @RequestBody Ingredients ingredients) throws SQLException {
         return ingredientsService.updateIngredients(id, ingredients);
     }
 }

@@ -18,7 +18,6 @@ public class IngredientsServiceImpl implements IngredientsService {
         this.ingredientsRepository = ingredientsRepository;
     }
 
-
     @Override
     public List<Ingredients> getAllIngredients() throws SQLException {
         return ingredientsRepository.getAllIngredients();
@@ -26,16 +25,16 @@ public class IngredientsServiceImpl implements IngredientsService {
 
     @Override
     public Ingredients getIngredientsById(int id) throws SQLException {
-        return ingredientsRepository.getIngredientsById(id);
+        return ingredientsRepository.getIngredientById(id);
     }
 
     @Override
     public Ingredients createIngredients(Ingredients ingredients) throws SQLException {
-        return ingredientsRepository.createIngredients(ingredients);
+        return ingredientsRepository.createIngredient(ingredients);
     }
 
     @Override
     public Ingredients updateIngredients(int id, Ingredients ingredients) throws SQLException {
-        return ingredientsRepository.updateIngredientTemplate(id, ingredients);
+        return ingredientsRepository.updateIngredient(id, ingredients);
     }
 }

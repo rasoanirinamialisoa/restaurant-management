@@ -10,12 +10,12 @@ import java.time.Instant;
 @AllArgsConstructor
 @ToString
 public class Movements {
-    private int id;
+    private Integer id;
     private String type;
-    private double quantity;
+    private Double quantity;
     private Instant date;
-    private double quantityRemaining;
-    private int idIngredientTemplate;
+    private Double quantityRemaining;
+    private Integer idIngredientTemplate;
 
     public static final String ID = "id";
     public static final String TYPE = "type";

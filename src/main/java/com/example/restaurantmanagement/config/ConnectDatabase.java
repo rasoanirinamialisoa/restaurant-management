@@ -8,6 +8,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -16,23 +18,23 @@ public class ConnectDatabase {
     public static String url = System.getenv("URL");
     public static String user = System.getenv("USER");
     public static String password = System.getenv("PASSWORD");
-    private static ConnectDatabase instance;
 
+    private static ConnectDatabase instance;
     public static ConnectDatabase getInstance() {
         if (instance == null) {
             instance = new ConnectDatabase();
-        } return instance;
+        }
+        return instance;
     }
-    public static Connection getConnection() throws SQLException {
+    public Connection getConnection(){
         try {
-            Connection connection = DriverManager.getConnection(url, password, user);
+            Connection connection = DriverManager.getConnection(url, user, password);
             if (connection != null) {
-                System.out.println("Connection ok!");
+                System.out.println("Connection successful !");
             }
             return connection;
         } catch (SQLException e) {
-            throw new RuntimeException();
+            throw new RuntimeException(e);
         }
     }
-
 }

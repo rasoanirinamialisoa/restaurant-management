@@ -8,10 +8,10 @@ import lombok.*;
 @AllArgsConstructor
 @ToString
 public class IngredientTemplate {
-    private int id;
+    private Integer id;
     private String name;
-    private double price;
-    private int idUnit;
+    private Double price;
+    private Integer idUnit;
 
     public static final String ID = "id";
     public static final String NAME = "name";

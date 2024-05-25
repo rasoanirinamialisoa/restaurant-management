@@ -10,6 +10,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringJoiner;
+
+import static com.example.restaurantmanagement.repository.SetParameter.setParameter;
+
 @Repository
 public class RestaurantRepositoryImpl implements RestaurantRepository {
 
@@ -63,10 +67,18 @@ public class RestaurantRepositoryImpl implements RestaurantRepository {
 
     @Override
     public Restaurant updateRestaurant(int id, Restaurant restaurant) throws SQLException {
-        String query = "UPDATE restaurant SET location = ? WHERE id = ?";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setString(1, restaurant.getLocation());
-            preparedStatement.setInt(2, id);
+        StringJoiner query = new StringJoiner(", ", "UPDATE restaurant SET ", " WHERE id = ?");
+
+        if (restaurant.getLocation() != null) {
+            query.add("location = ?");
+        }
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query.toString())) {
+            int parameterIndex = 1;
+            if (restaurant.getLocation() != null) {
+                setParameter(preparedStatement, parameterIndex++, restaurant.getLocation());
+            }
+            setParameter(preparedStatement, parameterIndex, id);
 
             int updatedRows = preparedStatement.executeUpdate();
             if (updatedRows > 0) {
@@ -75,6 +87,7 @@ public class RestaurantRepositoryImpl implements RestaurantRepository {
         }
         return null;
     }
+
 
     private Restaurant mapResultSetToRestaurant(ResultSet resultSet) throws SQLException {
         Restaurant restaurant = new Restaurant();

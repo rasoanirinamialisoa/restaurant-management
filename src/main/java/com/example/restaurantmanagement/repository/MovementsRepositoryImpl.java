@@ -7,6 +7,8 @@ import java.sql.*;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringJoiner;
+import static com.example.restaurantmanagement.repository.SetParameter.setParameter;
 
 @Repository
 public class MovementsRepositoryImpl implements MovementsRepository {
@@ -66,14 +68,42 @@ public class MovementsRepositoryImpl implements MovementsRepository {
 
     @Override
     public Movements updateMovement(int id, Movements movement) throws SQLException {
-        String query = "UPDATE movements SET type = ?, quantity = ?, date = ?, quantity_remaining = ?, id_ingredient_template = ? WHERE id = ?";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setString(1, movement.getType());
-            preparedStatement.setDouble(2, movement.getQuantity());
-            preparedStatement.setTimestamp(3, Timestamp.valueOf(String.valueOf(movement.getDate())));
-            preparedStatement.setDouble(4, movement.getQuantityRemaining());
-            preparedStatement.setInt(5, movement.getIdIngredientTemplate());
-            preparedStatement.setInt(6, id);
+        StringJoiner query = new StringJoiner(", ", "UPDATE movements SET ", " WHERE id = ?");
+
+        if (movement.getType() != null) {
+            query.add("type = ?");
+        }
+        if (movement.getQuantity() != null) {
+            query.add("quantity = ?");
+        }
+        if (movement.getDate() != null) {
+            query.add("date = ?");
+        }
+        if (movement.getQuantityRemaining() != null) {
+            query.add("quantity_remaining = ?");
+        }
+        if (movement.getIdIngredientTemplate() != null) {
+            query.add("id_ingredient_template = ?");
+        }
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query.toString())) {
+            int parameterIndex = 1;
+            if (movement.getType() != null) {
+                setParameter(preparedStatement, parameterIndex++,movement.getType());
+            }
+            if (movement.getQuantity() != null) {
+                setParameter(preparedStatement, parameterIndex++, movement.getQuantity());
+            }
+            if (movement.getDate() != null) {
+                preparedStatement.setTimestamp(parameterIndex++, Timestamp.valueOf(String.valueOf(movement.getDate())));
+            }
+            if (movement.getQuantityRemaining() != null) {
+                setParameter(preparedStatement, parameterIndex++, movement.getQuantityRemaining());
+            }
+            if (movement.getIdIngredientTemplate() != null) {
+                setParameter(preparedStatement, parameterIndex++, movement.getIdIngredientTemplate());
+            }
+            setParameter(preparedStatement, parameterIndex, id);
 
             int updatedRows = preparedStatement.executeUpdate();
             if (updatedRows > 0) {
@@ -88,7 +118,7 @@ public class MovementsRepositoryImpl implements MovementsRepository {
         movement.setId(resultSet.getInt("id"));
         movement.setType(resultSet.getString("type"));
         movement.setQuantity(resultSet.getDouble("quantity"));
-        movement.setDate(Instant.from(resultSet.getTimestamp("date").toLocalDateTime()));
+        movement.setDate(Instant.from(resultSet.getTimestamp("date").toInstant()));
         movement.setQuantityRemaining(resultSet.getDouble("quantity_remaining"));
         movement.setIdIngredientTemplate(resultSet.getInt("id_ingredient_template"));
         return movement;

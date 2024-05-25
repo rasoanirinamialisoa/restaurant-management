@@ -2,16 +2,18 @@ package com.example.restaurantmanagement.model;
 
 import lombok.*;
 
+import java.time.Instant;
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
 public class Price {
-    private int id;
-    private java.sql.Date date;
-    private double sellingPrice;
-    private double costPrice;
+    private Integer id;
+    private Instant date;
+    private Double sellingPrice;
+    private Double costPrice;
 
     public static final String ID = "id";
     public static final String DATE = "date";

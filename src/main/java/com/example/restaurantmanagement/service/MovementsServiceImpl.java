@@ -36,5 +36,10 @@ public class MovementsServiceImpl implements MovementsService {
         return movementsRepository.updateMovement(id, movement);
     }
 
+    @Override
+    public Movements updateQuantityRemaining(int id, Movements movements) throws SQLException {
+        return null;
+    }
+
 
 }

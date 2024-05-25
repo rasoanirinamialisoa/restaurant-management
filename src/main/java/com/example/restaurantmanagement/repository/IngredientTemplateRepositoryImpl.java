@@ -6,6 +6,9 @@ import org.springframework.stereotype.Repository;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringJoiner;
+
+import static com.example.restaurantmanagement.repository.SetParameter.setParameter;
 
 @Repository
 public class IngredientTemplateRepositoryImpl implements IngredientTemplateRepository {
@@ -62,12 +65,30 @@ public class IngredientTemplateRepositoryImpl implements IngredientTemplateRepos
 
     @Override
     public IngredientTemplate updateIngredientTemplate(int id, IngredientTemplate ingredientTemplate) throws SQLException {
-        String query = "UPDATE ingredient_template SET name = ?, price = ?, id_unit = ? WHERE id = ?";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setString(1, ingredientTemplate.getName());
-            preparedStatement.setDouble(2, ingredientTemplate.getPrice());
-            preparedStatement.setInt(3, ingredientTemplate.getIdUnit());
-            preparedStatement.setInt(4, id);
+        StringJoiner query = new StringJoiner(", ", "UPDATE ingredient_template SET ", " WHERE id = ?");
+
+        if (ingredientTemplate.getName() != null) {
+            query.add("name = ?");
+        }
+        if (ingredientTemplate.getPrice() != null) {
+            query.add("price = ?");
+        }
+        if (ingredientTemplate.getIdUnit() != null) {
+            query.add("id_unit = ?");
+        }
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query.toString())) {
+            int parameterIndex = 1;
+            if (ingredientTemplate.getName() != null) {
+                setParameter(preparedStatement, parameterIndex++, ingredientTemplate.getName());
+            }
+            if (ingredientTemplate.getPrice() != null) {
+                setParameter(preparedStatement, parameterIndex++, ingredientTemplate.getPrice());
+            }
+            if (ingredientTemplate.getIdUnit() != null) {
+                setParameter(preparedStatement, parameterIndex++, ingredientTemplate.getIdUnit());
+            }
+            setParameter(preparedStatement, parameterIndex, id);
 
             int updatedRows = preparedStatement.executeUpdate();
             if (updatedRows > 0) {

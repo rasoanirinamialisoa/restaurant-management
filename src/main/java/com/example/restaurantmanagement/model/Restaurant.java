@@ -9,7 +9,7 @@ import lombok.*;
 @AllArgsConstructor
 @ToString
 public class Restaurant {
-    private int id;
+    private Integer id;
     private String location;
 
     public static final String ID = "id";
