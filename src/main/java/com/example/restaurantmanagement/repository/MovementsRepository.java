@@ -14,4 +14,6 @@ public interface MovementsRepository {
     Movements createMovement(Movements movement) throws SQLException;
 
     Movements updateMovement(int id, Movements movement) throws SQLException;
+
+    Movements findLatestMovementByIngredientTemplate(Integer idIngredientTemplate) throws SQLException;
 }

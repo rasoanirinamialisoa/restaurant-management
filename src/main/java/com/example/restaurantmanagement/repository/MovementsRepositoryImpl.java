@@ -45,25 +45,49 @@ public class MovementsRepositoryImpl implements MovementsRepository {
         }
         return null;
     }
-
-
     @Override
     public Movements createMovement(Movements movement) throws SQLException {
         String query = "INSERT INTO movements (type, quantity, date, quantity_remaining, id_ingredient_template) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setString(1, movement.getType());
             preparedStatement.setDouble(2, movement.getQuantity());
-            preparedStatement.setTimestamp(3, Timestamp.valueOf(String.valueOf(movement.getDate())));
+            preparedStatement.setTimestamp(3, Timestamp.from(movement.getDate()));
             preparedStatement.setDouble(4, movement.getQuantityRemaining());
             preparedStatement.setInt(5, movement.getIdIngredientTemplate());
 
             int rowsAffected = preparedStatement.executeUpdate();
             if (rowsAffected > 0) {
-                return movement;
-            } else {
-                throw new SQLException("Failed to insert movement into database.");
+                try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        movement.setId(generatedKeys.getInt(1));
+                    } else {
+                        throw new SQLException("Creating movement failed, no ID obtained.");
+                    }
+                }
+            }
+            return movement;
+        }
+    }
+
+    @Override
+    public Movements findLatestMovementByIngredientTemplate(Integer idIngredientTemplate) throws SQLException {
+        String query = "SELECT * FROM movements WHERE id_ingredient_template = ? ORDER BY date DESC LIMIT 1";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setInt(1, idIngredientTemplate);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    Movements movements = new Movements();
+                    movements.setId(resultSet.getInt("id"));
+                    movements.setType(resultSet.getString("type"));
+                    movements.setQuantity(resultSet.getDouble("quantity"));
+                    movements.setDate(resultSet.getTimestamp("date").toInstant());
+                    movements.setQuantityRemaining(resultSet.getDouble("quantity_remaining"));
+                    movements.setIdIngredientTemplate(resultSet.getInt("id_ingredient_template"));
+                    return movements;
+                }
             }
         }
+        return null;
     }
 
     @Override
@@ -95,7 +119,7 @@ public class MovementsRepositoryImpl implements MovementsRepository {
                 setParameter(preparedStatement, parameterIndex++, movement.getQuantity());
             }
             if (movement.getDate() != null) {
-                preparedStatement.setTimestamp(parameterIndex++, Timestamp.valueOf(String.valueOf(movement.getDate())));
+                preparedStatement.setTimestamp(parameterIndex++, Timestamp.from(movement.getDate()));
             }
             if (movement.getQuantityRemaining() != null) {
                 setParameter(preparedStatement, parameterIndex++, movement.getQuantityRemaining());
@@ -112,6 +136,8 @@ public class MovementsRepositoryImpl implements MovementsRepository {
         }
         return null;
     }
+
+
 
     private Movements mapResultSetToMovement(ResultSet resultSet) throws SQLException {
         Movements movement = new Movements();

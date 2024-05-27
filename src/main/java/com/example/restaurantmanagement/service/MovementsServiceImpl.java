@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.List;
 @Service
 public class MovementsServiceImpl implements MovementsService {
@@ -36,10 +37,28 @@ public class MovementsServiceImpl implements MovementsService {
         return movementsRepository.updateMovement(id, movement);
     }
 
-    @Override
-    public Movements updateQuantityRemaining(int id, Movements movements) throws SQLException {
-        return null;
+    public Movements addStock(Movements movements) throws SQLException {
+        if ("entrance".equals(movements.getType())) {
+            Movements latestMovement = movementsRepository.findLatestMovementByIngredientTemplate(movements.getIdIngredientTemplate());
+            double updatedQuantityRemaining = (latestMovement != null ? latestMovement.getQuantityRemaining() : 0) + movements.getQuantity();
+            movements.setQuantityRemaining(updatedQuantityRemaining);
+            return movementsRepository.createMovement(movements);
+        } else {
+            throw new IllegalArgumentException("Invalid movement type for adding stock");
+        }
     }
-
+    public Movements consumeStock(Movements movements) throws SQLException {
+        if ("exit".equals(movements.getType())) {
+            Movements latestMovement = movementsRepository.findLatestMovementByIngredientTemplate(movements.getIdIngredientTemplate());
+            double updatedQuantityRemaining = (latestMovement != null ? latestMovement.getQuantityRemaining() : 0) - movements.getQuantity();
+            if (updatedQuantityRemaining < 0) {
+                throw new IllegalArgumentException("Not enough stock available");
+            }
+            movements.setQuantityRemaining(updatedQuantityRemaining);
+            return movementsRepository.createMovement(movements);
+        } else {
+            throw new IllegalArgumentException("Invalid movement type for consuming stock");
+        }
+    }
 
 }
