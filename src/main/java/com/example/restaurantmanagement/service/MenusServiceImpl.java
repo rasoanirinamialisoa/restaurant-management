@@ -39,4 +39,9 @@ public class MenusServiceImpl implements MenusService {
         return menusRepository.updateMenus(id, menus);
     }
 
+    @Override
+    public Menus deleteMenus(int id) throws SQLException {
+        return menusRepository.deleteMenus(id);
+    }
+
 }

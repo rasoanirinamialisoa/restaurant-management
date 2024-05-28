@@ -102,6 +102,18 @@ public class MenusRepositoryImpl implements MenusRepository {
         return null;
     }
 
+   @Override
+   public Menus deleteMenus(int id) throws SQLException {
+        String query = "DELETE from menus where id = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setInt(1, id);
+
+            int rowsAffected = preparedStatement.executeUpdate();
+            if (rowsAffected > 0);
+        }
+        return null;
+   }
+
     private Menus mapResultSetToMenus(ResultSet resultSet) throws SQLException {
         Menus menus = new Menus();
         menus.setId(resultSet.getInt(Menus.ID));

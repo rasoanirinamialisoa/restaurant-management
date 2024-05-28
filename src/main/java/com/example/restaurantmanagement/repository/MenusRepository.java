@@ -10,4 +10,5 @@ public interface MenusRepository {
     Menus getMenusById(int id) throws SQLException;
     Menus createMenus(Menus menus) throws SQLException;
     Menus updateMenus(int id, Menus menus) throws SQLException;
+    Menus deleteMenus(int id) throws SQLException;
 }
